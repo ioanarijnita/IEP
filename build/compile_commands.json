@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/IEP/IEP/build",
+  "command": "C:/msys64/mingw64/bin/g++   -g -std=gnu++14 -o CMakeFiles/Student.dir/Student.cpp.obj -c C:/IEP/IEP/Student.cpp",
+  "file": "C:/IEP/IEP/Student.cpp"
+}
+]
