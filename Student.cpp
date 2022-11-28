@@ -80,13 +80,6 @@ class Student
             return *this;
         }
 
-        Student& operator+=(const Student& rhs){
-
-        //...
-        //So, also make sure to return *this
-        return *this;
-        }
-
     private: 
     
         int age;
