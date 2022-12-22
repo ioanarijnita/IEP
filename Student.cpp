@@ -1,8 +1,9 @@
 #include <iostream>
+#include <memory>
 using namespace std;
+#define Lock_Code "";
 
 //Base Class
-
 class Uncopyable{
     protected:
         Uncopyable(){}
@@ -16,7 +17,9 @@ class Student
 
 //: private Uncopyable
 
-{                        
+{     
+    private:
+        bool isLocked = false;                   
     public: 
     
         Student(): 
@@ -38,9 +41,14 @@ class Student
        {}
         
        
-        void showStudent(){
-            // cout<<"The student with name: "<<firstName<<" "<<lastName<<" and age: "<<age<<" has the following grade: "<<grade<<"\n";
-             cout<<"The student with name: "<<firstName<<" "<<lastName<<" and age: "<<age<<" has the following grade: "<<*grade<<"\n";
+        string showStudent(){
+            if (isLocked)
+            {
+                return "Lock_Code";
+            } else {
+                // cout<<"The student with name: "<<firstName<<" "<<lastName<<" and age: "<<age<<" has the following grade: "<<grade<<"\n";
+                cout<<"The student with name: "<<firstName<<" "<<lastName<<" and age: "<<age<<" has the following grade: "<<*grade<<"\n";
+            }
          }
 
         ~Student(){ //destructor
@@ -80,6 +88,13 @@ class Student
             return *this;
         }
 
+    getisStudentLocked(){
+        return this->isLocked;
+    }
+
+    setStudentLocked(bool locked){
+        this->isLocked = locked;
+    }
     private: 
     
         int age;
@@ -96,6 +111,15 @@ class Student
      university(university) 
      {}
 
+void lockStudent(Student &value)
+        {
+           value.setStudentLocked(true);
+        }
+
+void unLockStudent(Student &value)
+        {
+            value.setStudentLocked(false);
+        }
 
 //Item 12
 
@@ -144,6 +168,51 @@ class CTIStudent: public Student {
     private:
         string faculty;
 };
+
+class LockedStudent:  private Uncopyable
+{
+
+public:
+    explicit LockedStudent(Student &value) : lockedStudent(value)
+    {
+        lockStudent(lockedStudent);
+    }
+
+    ~LockedStudent()
+    {
+        unLockStudent(lockedStudent);
+    }
+private:
+    Student &lockedStudent;
+};
+
+Student *createStudentInstance(int age, int grade, string firstName, string lastName, string university)
+{
+    return (new Student(age, grade, firstName, lastName, university));
+}
+
+//Item 13
+void createAndShowStudent()
+{
+    Student *s = createStudentInstance(21, 3, "Ana", "Maria", "UPT");
+    return;
+    delete s;
+   
+    unique_ptr<Student> newStudent(createStudentInstance(22, 4, "Ana", "Lorena", "UVT"));
+    newStudent->showStudent();
+
+    unique_ptr<Student> newStudent2 = move(newStudent);
+
+    shared_ptr<Student> s2(createStudentInstance(22, 4, "Vlad", "Andrei", "UMFT"));
+    shared_ptr<Student> s3(s2);
+   
+    s2->showStudent();
+    s3->showStudent();
+    s2.use_count();
+
+    shared_ptr<Student> s4 = move(s2);
+    s4->showStudent();
+}
   
 int main()
 {
@@ -168,6 +237,17 @@ int main()
       CTIStudent student6(19, 8, "Andrei", "Ionescu", "UPT", "CTI EN");
       student6.showStudent();
       cout<<"The student is enrolled at the following faculty: "<<student6.getFaculty()<<endl;
+
+      createAndShowStudent();
+
+    //Item 14
+    Student Student7(19, 8, "Andrei", "Ionescu", "UPT");
+    LockedStudent *lockedStudent = new LockedStudent(Student7);
+
+    Student7.showStudent();
+
+    delete lockedStudent;
+    Student7.showStudent();
 
     return 0;
 }
